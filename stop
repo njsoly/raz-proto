@@ -1,0 +1,4 @@
+#!/bin/bash
+sudo /home/pi/miscellany/motors_stop
+[ -n "$1" ] && echo "stopping motors and pausing for $1s" && sleep "$1"
+[ -z "$1" ] && echo "stopping motors"
