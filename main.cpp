@@ -89,7 +89,6 @@ void rightMotor(int r){
 	gpioPWM(RMOTOR_PWM, r);
 	
 }
-#define FULL_BORE (200)
 
 void motors_forward(){
 	leftMotor(FULL_BORE);

@@ -98,11 +98,8 @@ void motors_stop(){
 }
 
 int main(){
-	//std::cout << "putting motors forward.\n";
-
 	if(initGpio() == 1){ return 1; }
 	
-	time_sleep(0.01f);
 	motors_forward();
 	closeGpio();
 	return 0;
