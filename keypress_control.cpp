@@ -13,6 +13,19 @@
  int main(){
  
 	cout << "hello, you" << endl;
- 
+
+	bool quit = false;
+	cout << "enter commands; 'q' to quit.\n";
+	char c;
+	while(!quit){
+		// not right yet.  still waits for ENTER.
+		c = getchar(); 
+		
+		if(c == 'q' || c == 'Q'){
+			quit = true;
+		}
+		cout << "\rreceived command: '" << c << "'" << flush;
+	}
+	cout << "\ngoodbye." << endl;
 	return 0;
  }
