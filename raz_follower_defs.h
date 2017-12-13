@@ -17,7 +17,8 @@
 #define J8_38	20
 #define J8_40	21
 
-#define FULL_BORE 240
+#define FULL_BORE	255
+#define HALF_SPEED	127
 
 #define PWM0_PIN	12
 #define PWM1_PIN	13
@@ -26,7 +27,7 @@
 #define LMOTOR_DIR	J8_36
 #define RMOTOR_PWM	PWM1_PIN
 #define RMOTOR_DIR	J8_37
-#define LMOTOR_NSLP	J8_24
+#define MOTOR_NSLP	J8_24
 
 #define RC_1	17
 #define RC_2	27
@@ -48,7 +49,7 @@ int initGpio(){
 	gpioSetMode(RMOTOR_DIR, PI_OUTPUT);
 	gpioSetMode(LMOTOR_PWM, PI_ALT0);
 	gpioSetMode(RMOTOR_PWM, PI_ALT0);
-	gpioSetMode(LMOTOR_NSLP, PI_OUTPUT);
+	gpioSetMode(MOTOR_NSLP, PI_OUTPUT);
 	
 	return 0;
 }

@@ -5,6 +5,7 @@
 #include <pigpio.h>
 #include <stdio.h>
 #include <iostream>
+#include <cstdlib>
 
 // gpioSetMode(unsigned gpio, unsigned mode)
 // gpio 0-53, mode 0-7
@@ -53,14 +54,13 @@
 // #define RMOTOR_DIR	J8_37
 // 
 // // these may or may not need to be used.
-// #define LMOTOR_NSLP	
+// #define MOTOR_NSLP	
 
 #include "raz_follower_defs.h"
 
 using namespace std;
 
 void blinkGpio(int gpio){
-//	blinkGpio(LMOTOR_DIR);
 	for(int i = 0; i < 10; i++){
 		gpioWrite(gpio, i % 2);
 		time_sleep(0.5f);		
@@ -68,7 +68,7 @@ void blinkGpio(int gpio){
   
 }
 void leftMotor(int l){
-	gpioWrite(LMOTOR_NSLP, 1);
+	gpioWrite(MOTOR_NSLP, 1);
 	if(l < 0){
 		gpioWrite(LMOTOR_DIR, 0);
 		l = 0 - l;
@@ -79,6 +79,7 @@ void leftMotor(int l){
 	gpioPWM(LMOTOR_PWM, l);
 }
 void rightMotor(int r){
+	gpioWrite(MOTOR_NSLP, 1);
 	if(r < 0){
 		gpioWrite(RMOTOR_DIR, 1);
 		r = 0 - r;
@@ -101,7 +102,7 @@ void motors_backward(){
 void motors_stop(){
 	leftMotor(0);
 	rightMotor(0);
-	gpioWrite(LMOTOR_NSLP, 0);
+	gpioWrite(MOTOR_NSLP, 0);
 	
 }
 
@@ -111,7 +112,10 @@ int main(){
 	std::cout << "hello and welcome." << std::flush;
 
 	if(initGpio() == 1){ return 1; }
-	
+	if(atexit(closeGpio) != 0){
+		cerr << "could not register closeGpio() to atexit()." << endl;
+		return 1;
+	}
 	cout << "\rgoing forward..    " << flush;
 	motors_forward();
 	time_sleep(2.0f);
@@ -126,7 +130,7 @@ int main(){
 	motors_stop();
 	
 	cout << ("\rbye.                    \r\n");
-	closeGpio();
+	//closeGpio();
 	return 0;
 }
 

@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <pigpio.h>
 #include <stdio.h>
+#include <iostream>
+#include <cstdlib>
 
 // gpioSetMode(unsigned gpio, unsigned mode)
 // gpio 0-53, mode 0-7
@@ -52,68 +54,84 @@
 // #define RMOTOR_DIR	J8_37
 // 
 // // these may or may not need to be used.
-// #define LMOTOR_NSLP	
-// #define RMOTOR_NSLP	
+// #define MOTOR_NSLP	
 
 #include "raz_follower_defs.h"
 
+using namespace std;
 
 void blinkGpio(int gpio){
-//	blinkGpio(LMOTOR_DIR);
 	for(int i = 0; i < 10; i++){
 		gpioWrite(gpio, i % 2);
 		time_sleep(0.5f);		
 	}	
   
 }
-void delay(int millis);
-void pwmDoubleBreather(int, int);
-int initGpio();
-int initGpio(){
-	
-	if(gpioInitialise() < 0){
-		puts("couldn't initialize gpio.\n");
-		return 1;
+void leftMotor(int l){
+	gpioWrite(MOTOR_NSLP, 1);
+	if(l < 0){
+		gpioWrite(LMOTOR_DIR, 0);
+		l = 0 - l;
 	}
-
-	gpioSetMode(LMOTOR_DIR, PI_OUTPUT);
-	gpioSetMode(RMOTOR_DIR, PI_OUTPUT);
-	gpioSetMode(LMOTOR_PWM, PI_ALT0);
-	gpioSetMode(RMOTOR_PWM, PI_ALT0);
-	gpioSetMode(LMOTOR_NSLP, PI_OUTPUT);
-	gpioSetMode(RMOTOR_NSLP, PI_OUTPUT);
+	else
+		gpioWrite(LMOTOR_DIR, 1);
 	
-	return 0;
+	gpioPWM(LMOTOR_PWM, l);
+}
+void rightMotor(int r){
+	gpioWrite(MOTOR_NSLP, 1);
+	if(r < 0){
+		gpioWrite(RMOTOR_DIR, 1);
+		r = 0 - r;
+	}
+	else
+		gpioWrite(RMOTOR_DIR, 0);
+	
+	gpioPWM(RMOTOR_PWM, r);
+	
+}
+
+void motors_forward(){
+	leftMotor(FULL_BORE);
+	rightMotor(FULL_BORE);
+}
+void motors_backward(){
+	leftMotor(-FULL_BORE);
+	rightMotor(-FULL_BORE);
+}
+void motors_stop(){
+	leftMotor(0);
+	rightMotor(0);
+	gpioWrite(MOTOR_NSLP, 0);
+	
 }
 
 int main(){
 	// surround with silent try-catch-move-on?
 
-	printf("hello and welcome.");
+	std::cout << "hello and welcome." << std::flush;
 
-	if(initGpio() == 1){
+	if(initGpio() == 1){ return 1; }
+	if(atexit(closeGpio) != 0){
+		cerr << "could not register closeGpio() to atexit()." << endl;
 		return 1;
 	}
+	cout << "\rgoing forward..    " << flush;
+	motors_forward();
+	time_sleep(2.0f);
 	
-	delay(1000);
-	printf("\rbye.\n");
-
+	leftMotor(0);
+	rightMotor(0);
 	
-	gpioTerminate();
+	cout << "\rnow going backward." << flush;
+	motors_backward();
+	time_sleep(2.0f);
+	
+	motors_stop();
+	
+	cout << ("\rbye.                    \r\n");
+	//closeGpio();
 	return 0;
 }
 
-void delay(int millis){
-	time_sleep(0.001f * millis);
-}
-
-void pwmDoubleBreather(int gpioA, int gpioB){
-	for(int i = 0; i < 10; i++){
-		for(int j = 0; j < 255; j++){
-			gpioPWM(PWM0_PIN, (i % 2 == 0 ? j : 255 - j));
-			gpioPWM(PWM1_PIN, (i % 2 == 1 ? j : 255 - j));
-			time_sleep(0.002f);
-		}
-	}
-}
 
