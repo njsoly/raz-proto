@@ -23,11 +23,11 @@
 #define PWM0_PIN	12
 #define PWM1_PIN	13
 
-#define LMOTOR_PWM 	PWM0_PIN
-#define LMOTOR_DIR	J8_36
-#define RMOTOR_PWM	PWM1_PIN
-#define RMOTOR_DIR	J8_37
-#define MOTOR_NSLP	J8_24
+#define LMOTOR_PWM 	12
+#define LMOTOR_DIR	16
+#define RMOTOR_PWM	13
+#define RMOTOR_DIR	26
+#define MOTOR_NSLP	8
 
 #define RC_1	17
 #define RC_2	27
@@ -37,7 +37,16 @@ int initGpio();
 void delay(int millis);
 void pwmDoubleBreather(int, int);
 
+void blinkGpio(int gpio);
+void leftMotor(int l);
+void rightMotor(int r);
 void nl();
+int initGpio();
+void closeGpio();
+void motors_stop();
+void motors_forward(int speed);
+void motors_backward(int speed);
+
 int initGpio(){
 	
 	if(gpioInitialise() < 0){
@@ -51,6 +60,10 @@ int initGpio(){
 	gpioSetMode(RMOTOR_PWM, PI_ALT0);
 	gpioSetMode(MOTOR_NSLP, PI_OUTPUT);
 	
+	gpioSetMode(RC_1, PI_OUTPUT);
+	gpioSetMode(RC_2, PI_OUTPUT);
+	gpioSetMode(RC_3, PI_OUTPUT);
+	
 	return 0;
 }
 
@@ -62,14 +75,62 @@ void delay(int millis){
 	time_sleep(0.001f * ((float) millis));
 }
 
-void pwmDoubleBreather(int gpioA, int gpioB){
+void pwmDoubleBreather(int gpioA=PWM0_PIN, int gpioB=PWM1_PIN){
 	for(int i = 0; i < 10; i++){
 		for(int j = 0; j < 255; j++){
-			gpioPWM(PWM0_PIN, (i % 2 == 0 ? j : 255 - j));
-			gpioPWM(PWM1_PIN, (i % 2 == 1 ? j : 255 - j));
+			gpioPWM(gpioA, (i % 2 == 0 ? j : 255 - j));
+			gpioPWM(gpioB, (i % 2 == 1 ? j : 255 - j));
 			time_sleep(0.002f);
 		}
 	}
 }
 
+
+
+
+void blinkGpio(int gpio){
+	for(int i = 0; i < 10; i++){
+		gpioWrite(gpio, i % 2);
+		time_sleep(0.5f);		
+	}	
+  
+}
+void leftMotor(int l){
+	gpioWrite(MOTOR_NSLP, 1);
+	if(l < 0){
+		gpioWrite(LMOTOR_DIR, 0);
+		l = 0 - l;
+	}
+	else
+		gpioWrite(LMOTOR_DIR, 1);
+	
+	gpioPWM(LMOTOR_PWM, l);
+}
+void rightMotor(int r){
+	gpioWrite(MOTOR_NSLP, 1);
+	if(r < 0){
+		gpioWrite(RMOTOR_DIR, 1);
+		r = 0 - r;
+	}
+	else
+		gpioWrite(RMOTOR_DIR, 0);
+	
+	gpioPWM(RMOTOR_PWM, r);
+	
+}
+
+void motors_forward(int speed=HALF_SPEED){
+	leftMotor(speed);
+	rightMotor(speed);
+}
+void motors_backward(int speed=HALF_SPEED){
+	leftMotor(-speed);
+	rightMotor(-speed);
+}
+void motors_stop(){
+	leftMotor(0);
+	rightMotor(0);
+	gpioWrite(MOTOR_NSLP, 0);
+	
+}
 void nl(){ puts("\n"); }

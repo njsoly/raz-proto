@@ -31,80 +31,21 @@
 //
 //	in order to use PWM on BCM12 and BCM13, need to set gpio mode to PI_ALT0
 //	in order to use PWM on BCM18, need to set gpio mode to PI_ALT5
-
-// #define J8_8	4
-// #define J8_10	15
-// #define J8_11	17
-// #define J8_12	18
-// #define J8_13	27
-// #define J8_15	22
-// #define J8_32	12
-// #define J8_33	13
-// #define J8_36	16
-// #define J8_37	26
-// #define J8_38	20
-// #define J8_40	21
+//
 // 
 // #define PWM0_PIN	12
 // #define PWM1_PIN	13
 // 
-// #define LMOTOR_PWM 	PWM0_PIN
-// #define LMOTOR_DIR	J8_36
-// #define RMOTOR_PWM	PWM1_PIN
-// #define RMOTOR_DIR	J8_37
-// 
-// // these may or may not need to be used.
-// #define MOTOR_NSLP	
+// #define LMOTOR_PWM 	12
+// #define LMOTOR_DIR	16
+// #define RMOTOR_PWM	13
+// #define RMOTOR_DIR	26
 
 #include "raz_follower_defs.h"
 
 using namespace std;
 
-void blinkGpio(int gpio){
-	for(int i = 0; i < 10; i++){
-		gpioWrite(gpio, i % 2);
-		time_sleep(0.5f);		
-	}	
-  
-}
-void leftMotor(int l){
-	gpioWrite(MOTOR_NSLP, 1);
-	if(l < 0){
-		gpioWrite(LMOTOR_DIR, 0);
-		l = 0 - l;
-	}
-	else
-		gpioWrite(LMOTOR_DIR, 1);
-	
-	gpioPWM(LMOTOR_PWM, l);
-}
-void rightMotor(int r){
-	gpioWrite(MOTOR_NSLP, 1);
-	if(r < 0){
-		gpioWrite(RMOTOR_DIR, 1);
-		r = 0 - r;
-	}
-	else
-		gpioWrite(RMOTOR_DIR, 0);
-	
-	gpioPWM(RMOTOR_PWM, r);
-	
-}
 
-void motors_forward(){
-	leftMotor(FULL_BORE);
-	rightMotor(FULL_BORE);
-}
-void motors_backward(){
-	leftMotor(-FULL_BORE);
-	rightMotor(-FULL_BORE);
-}
-void motors_stop(){
-	leftMotor(0);
-	rightMotor(0);
-	gpioWrite(MOTOR_NSLP, 0);
-	
-}
 
 int main(){
 	// surround with silent try-catch-move-on?
