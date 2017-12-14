@@ -46,6 +46,14 @@ void closeGpio();
 void motors_stop();
 void motors_forward(int speed);
 void motors_backward(int speed);
+void set_motors(int lspeed, int rspeed);
+
+
+
+void set_motors(int lspeed, int rspeed){
+	leftMotor(lspeed);
+	rightMotor(rspeed);
+}
 
 int initGpio(){
 	
