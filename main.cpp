@@ -45,10 +45,11 @@
 
 using namespace std;
 
-unsigned int rc_values[3]={0,0,0};
+long int rc_values[3]={0,0,0};
 uint16_t rc_charge_us = 50;
 
-unsigned int* qtr3rc_read(){
+long int* qtr3rc_read(){
+	gpioSetPad(0, 16); // the sensors want 17mA, let's at least get 16 (the max).
 	// set the RC sensor pins to output, and set HIGH to charge
 	gpioSetMode(RC_2, PI_OUTPUT);
 	gpioSetMode(RC_1, PI_OUTPUT);
@@ -61,11 +62,8 @@ unsigned int* qtr3rc_read(){
 	gpioSetMode(RC_2, PI_INPUT);
 	gpioSetMode(RC_1, PI_INPUT);
 	gpioSetMode(RC_3, PI_INPUT);
-	gpioWrite(RC_2, 0);
-	gpioWrite(RC_1, 0);
-	gpioWrite(RC_3, 0);
-
-	long unsigned int ticks[3]{0,0,0};
+	
+	long int ticks[3]{0,0,0};
 	long unsigned int tickStart = gpioTick();
 	printf("tickStart: %lu\n", (tickStart));
 	
@@ -113,11 +111,11 @@ int main(){
 // 	time_sleep(2.0f);
 // 	
 // 	motors_stop();
-
+	gpioSetPad(0, 16);
 	cout << "reading sensors:  " << endl;
 	for(int i = 0; i < 100; i++){
 		qtr3rc_read();
-		printf("%d\t%d\t%d\t   \n", rc_values[0], rc_values[1], rc_values[2] );
+		printf("%lu\t%lu\t%lu\t   \n", rc_values[0], rc_values[1], rc_values[2] );
 		time_sleep(0.250f);
 	}
 
