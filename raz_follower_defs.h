@@ -29,9 +29,13 @@
 #define RMOTOR_DIR	26
 #define MOTOR_NSLP	8
 
-#define RC_1	17
+#define RC_1	4
 #define RC_2	27
-#define RC_3	22
+#define RC_3	24
+
+// defines for two-sensor config of QTR-1RC sensors.
+#define RC_L	20
+#define RC_R	21
 
 int initGpio();
 void delay(int millis);
@@ -71,6 +75,7 @@ int initGpio(){
 	gpioSetMode(RC_1, PI_OUTPUT);
 	gpioSetMode(RC_2, PI_OUTPUT);
 	gpioSetMode(RC_3, PI_OUTPUT);
+	gpioWrite(MOTOR_NSLP, 0);
 	
 	return 0;
 }
