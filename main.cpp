@@ -63,20 +63,20 @@ uint32_t* qtr3rc_read_parallel(){
 	gpioSetMode(RC_1, PI_INPUT);
 	gpioSetMode(RC_3, PI_INPUT);
 	
-	long int ticks[3]{0,0,0};
-	long unsigned int tickStart = gpioTick();
-	printf("tickStart: %lu\n", (tickStart));
+	uint32_t ticks[3]{0,0,0};
+	uint32_t tickStart = gpioTick();
+	printf("tickStart: %d\n", (tickStart));
 	
 	// keep reading whichever ones are HIGH, until they're all low.
 	while(ticks[0] == 0 || ticks[1] == 0 || ticks[2] == 0){
 		if(ticks[0] == 0 && (gpioRead(RC_1) == 0)){
 			ticks[0] = gpioTick();
 		}
-		if(ticks[2] == 0 && (gpioRead(RC_3) == 0)){
-			ticks[2] = gpioTick();
-		}
 		if(ticks[1] == 0 && (gpioRead(RC_2) == 0)){
 			ticks[1] = gpioTick();
+		}
+		if(ticks[2] == 0 && (gpioRead(RC_3) == 0)){
+			ticks[2] = gpioTick();
 		}
 	}
 	
@@ -95,7 +95,7 @@ uint32_t* qtr3rc_read(){
 	uint32_t ticks[3]{0,0,0};
 	uint32_t tickStart = gpioTick();
 	
-	printf("tickStart: %u\n", (tickStart));
+	printf("tickStart: %d\n", (tickStart));
 	
 	gpioSetPad(0, 16); // the sensors want 17mA, let's at least get 16 (the max).
 	if(gpioGetPad(0) != 16) {
@@ -118,6 +118,7 @@ uint32_t* qtr3rc_read(){
 		}
 	}
 	rc_values[0] = (ticks[0] - tickStart);
+	printf("sensor 1: %u = %u - %u\n", rc_values[0], ticks[0], tickStart);
 
 	// read sensor 2
 	tickStart = gpioTick();
@@ -125,12 +126,14 @@ uint32_t* qtr3rc_read(){
 	gpioWrite(RC_2, 1);
 	gpioDelay(rc_charge_us);
 	gpioSetMode(RC_2, PI_INPUT);
-	while(ticks[2] == 0){
-		if(ticks[2] == 0 && (gpioRead(RC_3) == 0)){
-			ticks[2] = gpioTick();
+	while(ticks[1] == 0){
+		if(ticks[1] == 0 && (gpioRead(RC_2) == 0)){
+			ticks[1] = gpioTick();
 		}
 	}
 	rc_values[1] = (ticks[1] - tickStart);
+	printf("sensor 2: %u = %u - %u\n", rc_values[1], ticks[1], tickStart);
+
 	
 	// read sensor 3
 	tickStart = gpioTick();
@@ -138,46 +141,47 @@ uint32_t* qtr3rc_read(){
 	gpioWrite(RC_3, 1);
 	gpioDelay(rc_charge_us);
 	gpioSetMode(RC_3, PI_INPUT);
-	while(ticks[1] == 0){
-		if((gpioRead(RC_2) == 0)){
-			ticks[1] = gpioTick();
+	while(ticks[2] == 0){
+		if((gpioRead(RC_3) == 0)){
+			ticks[2] = gpioTick();
 		}
 	}
 	
 	rc_values[2] = (ticks[2] - tickStart);
-	
-	
+	printf("sensor 3: %u = %u - %u\n", rc_values[2], ticks[2], tickStart);
+		
 	
 	return &(rc_values[0]);
 }
 
-
-int main(){
-	// surround with silent try-catch-move-on?
-
-	std::cout << "hello and welcome." << std::flush;
-
-	if(initGpio() == 1){ return 1; }
+int gpioInitAndRegisterClose(){
+	if(initGpio() == 1){ 
+		return 1; 
+	}
+	
 	if(atexit(closeGpio) != 0){
 		cerr << "could not register closeGpio() to atexit()." << endl; return 1;
 	}
-// 	cout << "\rgoing forward..    " << flush;
-// 	motors_forward();
-// 	time_sleep(2.0f);
-// 	
-// 	leftMotor(0);
-// 	rightMotor(0);
-// 	
-// 	cout << "\rnow going backward." << flush;
+	return 0;
+}
+
+int main(){
+	std::cout << "hello and welcome." << std::flush;
+	
+	if(gpioInitAndRegisterClose() != 0){
+		cerr << "failed gpio init and register close at exit." << endl;
+		return 1;
+	}
+
 // 	motors_backward();
 // 	time_sleep(2.0f);
-// 	
 // 	motors_stop();
+
 	gpioSetPad(0, 16);
 	cout << "reading sensors:  " << endl;
-	for(int i = 0; i < 100; i++){
+	for(int i = 0; i < 80; i++){
 		qtr3rc_read();
-		printf("%u\t%u\t%u\t   \n", rc_values[0], rc_values[1], rc_values[2] );
+		printf("%d\t%d\t%d\t   \n", rc_values[0], rc_values[1], rc_values[2] );
 		time_sleep(0.250f);
 	}
 
