@@ -45,12 +45,10 @@
 
 using namespace std;
 
-uint32_t rc_values[3]={0,0,0};
+uint32_t rc_values[3]={0,0};
 uint16_t rc_charge_us = 30;
-uint32_t ticks[3]={0,0,0};
+uint32_t ticks[2]={0,0};
 
-uint32_t* qtr3rc_read_parallel();
-uint32_t* qtr3rc_read();
 uint32_t* qtr1rc2_read();
 
 
@@ -90,18 +88,6 @@ int main(){
 	return 0;
 }
 
-
-class Raz_Motors {
-
-	// 
-	Raz_Motors(uint8_t leftPwm, uint8_t leftDir, 
-			  uint8_t rightPwm, uint8_t rightDir,
-			  uint8_t notsleep){
-		
-	}
-	
-	
-};
 
 /** just read a left and right sensor.
  */
@@ -155,114 +141,4 @@ uint32_t* qtr1rc2_read(){
 }
 
 
-/** this version of the method doesn't try to charge or read the sensors
- * in a parallel fashion
- */
-uint32_t* qtr3rc_read(){
-	uint32_t tickStart = gpioTick();
-	ticks[0] = 0;
-	ticks[1] = 0;
-	ticks[2] = 0;
-	
-	printf("tickStart: %d\n", (tickStart));
-	
-	gpioSetPad(0, 16); // the sensors want 17mA, let's at least get 16 (the max).
-	if(gpioGetPad(0) != 16) {
-		printf("ERROR: pad strength set didn't work.\n");
-	}
-	
-	gpioSetMode(RC_2, PI_INPUT);
-	gpioSetMode(RC_1, PI_INPUT);
-	gpioSetMode(RC_3, PI_INPUT);
-
-	// read sensor 1
-	tickStart = gpioTick();
-	gpioSetMode(RC_1, PI_OUTPUT);
-	gpioWrite(RC_1, 1);
-	gpioDelay(rc_charge_us);
-	gpioSetMode(RC_1, PI_INPUT);
-	while(ticks[0] == 0 || gpioRead(RC_1) == 1){
-		if((gpioRead(RC_1) == 0) && gpioRead(RC_1) == 0){
-			ticks[0] = gpioTick();
-		}
-	}
-	rc_values[0] = (ticks[0] - tickStart);
-	
-	printf("sensor 1: %u = %u - %u\n", rc_values[0], ticks[0], tickStart);
-
-	// read sensor 2
-	tickStart = gpioTick();
-	gpioSetMode(RC_2, PI_OUTPUT);
-	gpioWrite(RC_2, 1);
-	gpioDelay(rc_charge_us);
-	gpioSetMode(RC_2, PI_INPUT);
-	while(ticks[1] == 0){
-		if((gpioRead(RC_2) == 0) && gpioRead(RC_2) == 0){
-			ticks[1] = gpioTick();
-		}
-	}
-	rc_values[1] = (ticks[1] - tickStart);
-	printf("sensor 2: %u = %u - %u\n", rc_values[1], ticks[1], tickStart);
-
-	
-	// read sensor 3
-	tickStart = gpioTick();
-	gpioSetMode(RC_3, PI_OUTPUT);
-	gpioWrite(RC_3, 1);
-	gpioDelay(rc_charge_us);
-	gpioSetMode(RC_3, PI_INPUT);
-	while(ticks[2] == 0){
-		if((gpioRead(RC_3) == 0) && gpioRead(RC_3) == 0){
-			ticks[2] = gpioTick();
-		}
-	}
-	
-	rc_values[2] = (ticks[2] - tickStart);
-	printf("sensor 3: %u = %u - %u\n", rc_values[2], ticks[2], tickStart);
-		
-	
-	return &(rc_values[0]);
-}
-
-
-uint32_t* qtr3rc_read_parallel(){
-	gpioSetPad(0, 16); // the sensors want 17mA, let's at least get 16 (the max).
-	// set the RC sensor pins to output, and set HIGH to charge
-	gpioSetMode(RC_2, PI_OUTPUT);
-	gpioSetMode(RC_1, PI_OUTPUT);
-	gpioSetMode(RC_3, PI_OUTPUT);
-	gpioWrite(RC_2, 1);
-	gpioWrite(RC_1, 1);
-	gpioWrite(RC_3, 1);
-	gpioDelay(rc_charge_us);
-
-	gpioSetMode(RC_2, PI_INPUT);
-	gpioSetMode(RC_1, PI_INPUT);
-	gpioSetMode(RC_3, PI_INPUT);
-	
-	uint32_t ticks[3]{0,0,0};
-	uint32_t tickStart = gpioTick();
-	printf("tickStart: %d\n", (tickStart));
-	
-	// keep reading whichever ones are HIGH, until they're all low.
-	while(ticks[0] == 0 || ticks[1] == 0 || ticks[2] == 0){
-		if(ticks[0] == 0 && (gpioRead(RC_1) == 0)){
-			ticks[0] = gpioTick();
-		}
-		if(ticks[1] == 0 && (gpioRead(RC_2) == 0)){
-			ticks[1] = gpioTick();
-		}
-		if(ticks[2] == 0 && (gpioRead(RC_3) == 0)){
-			ticks[2] = gpioTick();
-		}
-	}
-	
-	rc_values[0] = (ticks[0] - tickStart);
-	rc_values[1] = (ticks[1] - tickStart);
-	rc_values[2] = (ticks[2] - tickStart);
-	
-	
-	
-	return &(rc_values[0]);
-}
 
