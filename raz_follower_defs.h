@@ -37,6 +37,43 @@
 #define RC_L	20
 #define RC_R	21
 
+// this is an LED that will turn on at the beginning of the program, 
+// after the GPIO library resources have been initialized, and 
+// will stay on for the duration of the program.  
+// 
+// the purpose this will serve is to let the user know when the power for the 
+// motors may be switched on without unexpected motor activity.
+#define LED_MOTORS_INITIALIZED
+
+// these LEDS will light when the line is detected under one of the sensors.
+// since there are only two of them, simple autonomous driving strategies 
+// should not see these lit up for more than a flicker or so.
+// the lights are also useful to test threshold values when holding the 
+// cart, or during manual drive.
+#define LED_LINE_ON_LEFT
+#define LED_LINE_ON_RIGHT
+
+// these LEDs will show when the car is being driven or driving itself.
+#define LED_MANUAL_DRIVE
+#define LED_AUTONOMOUS_DRIVE
+
+/**************** 	ACCELEROMETER :: ADXL345 :: I2C ***********************/
+#define ADXL_BUS 1
+#define ADXL_ADDRESS 0x53
+
+// this is the function header for the call to open the i2c.
+//int i2cOpen(unsigned i2cBus, unsigned i2cAddr, unsigned i2cFlags);
+
+/*	// these are lines from the ADXL345 python example, for initialization.
+ *   pi.i2c_write_byte_data(h, 0x2d, 0)  # POWER_CTL reset.
+ *   pi.i2c_write_byte_data(h, 0x2d, 8)  # POWER_CTL measure.
+ *   pi.i2c_write_byte_data(h, 0x31, 0)  # DATA_FORMAT reset.
+ *   pi.i2c_write_byte_data(h, 0x31, 11) # DATA_FORMAT full res +/- 16g.
+ */
+
+
+
+
 int initGpio();
 void delay(int millis);
 void pwmDoubleBreather(int, int);

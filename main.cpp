@@ -32,15 +32,9 @@
 //	in order to use PWM on BCM12 and BCM13, need to set gpio mode to PI_ALT0
 //	in order to use PWM on BCM18, need to set gpio mode to PI_ALT5
 //
-// 
-// #define PWM0_PIN	12
-// #define PWM1_PIN	13
-// 
-// #define LMOTOR_PWM 	12
-// #define LMOTOR_DIR	16
-// #define RMOTOR_PWM	13
-// #define RMOTOR_DIR	26
 
+// defines the GPIO numbers and other things.
+// defines include RC_L, RC_R, MOTORL_PWM, ETC.
 #include "raz_follower_defs.h"
 
 using namespace std;
