@@ -71,7 +71,11 @@
  *   pi.i2c_write_byte_data(h, 0x31, 11) # DATA_FORMAT full res +/- 16g.
  */
 
-
+int initAccelero();
+int initAccelero(){
+	
+	return 0;
+}
 
 
 int initGpio();
