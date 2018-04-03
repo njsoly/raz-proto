@@ -1,10 +1,10 @@
 #!/bin/bash
-# can bash do the loop better?
-
-
+# this script is a tester.
+# it is for messing around with accepting individual, single-keystroke commands,
+# eventually to remotely control the Raspberry Pi line follower through SSH 
+# in a command-line window.
 
 y=; 
-
 
 printf "type characters to send commands.\n\ttype 'q' to quit.\n"; 
 while [ "$x" != "q" ]; do 
