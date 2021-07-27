@@ -4,8 +4,16 @@
 ################################################################################
 
 # add user to gpio group.
-sudo usermod -a -G gpio $USER
+if [ -n "$(groups $USER | grep gpio)" ]; then
+	echo "in dialout.";
+else
+	sudo usermod -a -G gpio $USER
+fi
 
 # add user to the dialout group.  I think Arduino IDE needed it to use Rx/Tx, so Pi might, too
-sudo adduser $USER dialout
+if [ -n "$(groups $USER | grep dialout)" ]; then
+	echo "in dialout.";
+else
+	sudo adduser $USER dialout
+fi
 
