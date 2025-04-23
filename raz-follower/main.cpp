@@ -1,4 +1,12 @@
-/****************** main.c ******************/
+/****************** main.c *****************************************************
+ * This file was the beginning of code for a line-following Raspberry Pi robot.
+ * It ran on the Pi itself, which would then control its GPIOs through PiGpio.
+ * You would SSH onto the Pi's terminal to type your commands.
+ *
+ * I can't recall how much it worked.
+ * I think I got the motors and control (serial) to work.
+ * Maybe never hooked up the sensors.
+ *******************************************************************************/
 
 #include <stdio.h>
 #include <unistd.h>
@@ -40,12 +48,11 @@
 using namespace std;
 
 uint32_t rc_values[3]={0,0};
-uint16_t rc_charge_us = 30;
+/** What was this for?  You need to charge something? Is that how GPIO pull-ups work? */
+uint16_t rc_charge_us = 30; 
 uint32_t ticks[2]={0,0};
 
-uint32_t* qtr1rc2_read();
-
-
+uint32_t* qtr1rc2_read(); // QTR comes from the sensor module name (Pololu?)
 
 int gpioInitAndRegisterClose(){
 	if(initGpio() == 1){ 
