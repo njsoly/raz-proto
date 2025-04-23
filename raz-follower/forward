@@ -1,4 +1,8 @@
 #!/bin/bash
+
+##### "forward" ####
+# A simple bash script, callable by name (because `.` was in the PATH),
+# which would then call another executable to control the Pi's motors via a motor controller on GPIO.
+
 sudo /home/pi/miscellany/motors_forward
 [ -z "$1" ] && echo "going forward" || ( echo "going forward for $1s" && sleep "$1" )
-
