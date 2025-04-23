@@ -1,8 +1,9 @@
-# "backward"
+#!/bin/bash
+
+##### "backward" ####
 # A simple bash script, callable by name (because `.` was in the PATH),
 # which would then call another executable to control the Pi's motors via a motor controller on GPIO.
 
-#!/bin/bash
 sudo /home/pi/miscellany/motors_backward
 [ -n "$1" ] && echo "going backward for $1s" && sleep "$1"
 [ -z "$1" ] && echo "going backward"
